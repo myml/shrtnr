@@ -57,6 +57,8 @@ Store it as a secret or as a variable in the dashboard, not as a `vars` entry in
 
 It takes a bare host or a full origin, and must not carry a path, a query string or credentials: short links live at the root, where the `/:slug` route is. Unset is the default and keeps the request origin, so a deployment that never sets it behaves as before. A value that is not a bare http(s) origin is ignored, the request origin is used instead, and the Worker logs a warning once per isolate.
 
+A client that composes short URLs itself, an extension or an SDK, reads the resolved origin from `GET /_/api/config` or from the `short_origin` field on any link response. Both report the pinned value when there is one and the request origin otherwise, so a client never has to guess which of several domains is the one links live on.
+
 The domain still has to be attached to the Worker and reachable: this setting changes which URL is handed out, it does not create the domain. Admin access is a separate question, so an operator can open the admin on one domain and hand out links on another. The identity behind every write still comes from whichever Access application covers the host the admin was opened on.
 
 ### Local development

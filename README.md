@@ -138,6 +138,8 @@ Store it as a secret or as a variable in the Cloudflare dashboard, not as a `var
 
 Unset is the default and keeps the request origin. A value that is not a bare http(s) origin is ignored, and the request origin is used. The domain still has to be attached to the Worker: the setting changes which URL is handed out, it does not create the domain.
 
+A client that builds short URLs itself reads the same origin from `GET /_/api/config`, or from the `short_origin` field every link response carries, rather than assuming the host it reached the API on. See [API](#api).
+
 ## MCP server
 
 Point Claude, Copilot or any other MCP client at `https://mcp.<your-domain>` and sign in through Cloudflare Access when the browser opens. The endpoint needs its own subdomain and a second Access application with Managed OAuth turned on, plus the `MCP_ACCESS_AUD` secret. The one setting that catches people out is Cloudflare's "Block AI bots" rule, which has to be off for the zone. The setup walkthrough, client configuration snippets and the tool reference are in [docs/mcp.md](docs/mcp.md).
@@ -157,7 +159,7 @@ For full endpoint shapes, parameters, and example payloads, see the live API ref
 
 ## SDKs
 
-Shorten URLs, manage slugs and bundles, and read analytics from your own code. All three expose the same resource groups: `links`, `slugs` and `bundles`.
+Shorten URLs, manage slugs and bundles, and read analytics from your own code. All three expose the same resource groups: `links`, `slugs`, `bundles` and `config`.
 
 - TypeScript/JavaScript: [`@oddbit/shrtnr`](https://www.npmjs.com/package/@oddbit/shrtnr) on npm. Details in [sdk/typescript/README.md](sdk/typescript/README.md).
 - Python: [`shrtnr`](https://pypi.org/project/shrtnr/) on PyPI. Sync and async clients on httpx. Details in [sdk/python/README.md](sdk/python/README.md).
