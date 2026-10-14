@@ -23,6 +23,14 @@ function placeholders(value: string): string[] {
   return [...(value.match(/\{[a-zA-Z0-9_]+\}/g) ?? [])].sort();
 }
 
+/**
+ * Every supported language except the fallback. Derived once here: the
+ * placeholder and key-parity suites both iterate it, so a change to the
+ * default language or to the exclusion rule lands in one place instead of
+ * two copies that drift apart.
+ */
+const translated = SUPPORTED_LANGUAGES.filter((lang) => lang !== DEFAULT_LANGUAGE);
+
 describe("i18n", () => {
   describe("isSupportedLanguage", () => {
     it("returns true for supported languages", () => {
@@ -71,8 +79,6 @@ describe("i18n", () => {
     // types the placeholders inside a value, so a locale can keep the key and
     // silently drop the interpolation the key exists for. Driven off
     // SUPPORTED_LANGUAGES so a new locale is covered the day it is registered.
-    const translated = SUPPORTED_LANGUAGES.filter((lang) => lang !== DEFAULT_LANGUAGE);
-
     it.each(translated)("keeps every %s placeholder that en declares", (lang) => {
       const locale = getTranslations(lang);
       for (const key of Object.keys(en) as (keyof typeof en)[]) {
@@ -148,15 +154,15 @@ describe("i18n", () => {
     });
 
     it("lists all supported languages", () => {
-      expect(SUPPORTED_LANGUAGES).toContain("en");
-      expect(SUPPORTED_LANGUAGES).toContain("id");
-      expect(SUPPORTED_LANGUAGES).toContain("sv");
+      // The exact set, not one containment per language: a locale dropped from
+      // the array used to leave this test green, because its sibling parity
+      // suites iterate the array itself and would simply run one case fewer.
+      expect([...SUPPORTED_LANGUAGES]).toEqual(["en", "id", "sv", "zh"]);
     });
   });
 
   describe("key parity across locales", () => {
     const enKeys = new Set(flattenKeys(en));
-    const translated = SUPPORTED_LANGUAGES.filter((lang) => lang !== DEFAULT_LANGUAGE);
 
     it.each(translated)("locale %s has the same key set as en", (lang) => {
       const localeKeys = new Set(flattenKeys(getTranslations(lang)));

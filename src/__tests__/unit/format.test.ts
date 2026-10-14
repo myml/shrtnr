@@ -21,9 +21,11 @@ describe("fmtNumber", () => {
   });
 
   it("groups thousands for zh", () => {
-    // Chinese groups with commas like en. Pinned so a locale whose ICU data is
-    // missing, and which therefore falls back to the runtime default, is a
-    // deliberate decision rather than a surprise.
+    // Chinese groups with commas like en, so the output alone cannot tell a
+    // resolved zh locale from the en-US fallback the runtime uses when it has
+    // no zh ICU data. Assert the locale the formatter actually resolved, then
+    // the digits it produced.
+    expect(new Intl.NumberFormat("zh").resolvedOptions().locale).toMatch(/^zh/);
     expect(fmtNumber(1234567, "zh")).toBe("1,234,567");
   });
 
