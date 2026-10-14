@@ -65,7 +65,7 @@ const zh: Translations = {
   "links.allDisabled": "所有链接均已停用。选择“已停用”筛选即可查看。",
   "links.noMatches": "没有符合当前筛选条件的链接。",
   "links.noSearchMatches": "没有匹配“{query}”的链接。",
-  "links.noSearchMatchesInFilter": "在{filter}中没有匹配“{query}”的链接。",
+  "links.noSearchMatchesInFilter": "在“{filter}”筛选下没有匹配“{query}”的链接。",
   "links.empty": "暂无链接。使用上方的“+ 新建链接”按钮开始。",
   "links.disabled": "已停用",
   "links.clicks": "次点击",
