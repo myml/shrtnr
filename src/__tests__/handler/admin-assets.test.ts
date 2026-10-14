@@ -23,7 +23,7 @@ async function pageHtml(path: string, headers?: Record<string, string>): Promise
 }
 
 const STYLESHEET = /<link rel="stylesheet" href="(\/_\/assets\/admin\.[0-9a-f]{8,}\.css)"\s*\/?>/;
-const SCRIPT = /<script src="(\/_\/assets\/client\.([a-z]{2})\.[0-9a-f]{8,}\.js)"><\/script>/;
+const SCRIPT = /<script src="(\/_\/assets\/client\.([A-Za-z-]+)\.[0-9a-f]{8,}\.js)"><\/script>/;
 
 beforeAll(applyMigrations);
 beforeEach(resetData);
@@ -84,12 +84,12 @@ describe("GET /_/assets/*", () => {
   });
 
   it("gives each language its own script URL", async () => {
-    const en = (await pageHtml("/_/admin/settings")).match(SCRIPT)![1];
-    const sv = (await pageHtml("/_/admin/settings", { Cookie: "lang=sv" })).match(SCRIPT)![1];
-    const zh = (await pageHtml("/_/admin/settings", { Cookie: "lang=zh" })).match(SCRIPT)![1];
-    expect(en).not.toBe(sv);
-    expect(en).not.toBe(zh);
-    expect(sv).not.toBe(zh);
+    const enUrl = (await pageHtml("/_/admin/settings")).match(SCRIPT)![1];
+    const svUrl = (await pageHtml("/_/admin/settings", { Cookie: "lang=sv" })).match(SCRIPT)![1];
+    const zhUrl = (await pageHtml("/_/admin/settings", { Cookie: "lang=zh" })).match(SCRIPT)![1];
+    expect(enUrl).not.toBe(svUrl);
+    expect(enUrl).not.toBe(zhUrl);
+    expect(svUrl).not.toBe(zhUrl);
   });
 
   it("serves the Simplified Chinese client script to a lang=zh viewer", async () => {
@@ -120,7 +120,16 @@ describe("GET /_/assets/*", () => {
   });
 
   it("answers the branded 404 for a path that names no asset of this app", async () => {
-    for (const path of ["/_/assets/client.xx.0000000000000000.js", "/_/assets/vendor.js", "/_/assets/admin.css"]) {
+    // "zh-Hant" is language-shaped but not registered, so it has to be the
+    // supported-language check that refuses it, not the shape of the path.
+    // A locale that ever registers such a code gets the no-store fallback
+    // during a deploy window instead of this 404.
+    for (const path of [
+      "/_/assets/client.xx.0000000000000000.js",
+      "/_/assets/client.zh-Hant.0000000000000000.js",
+      "/_/assets/vendor.js",
+      "/_/assets/admin.css",
+    ]) {
       const res = await SELF.fetch(req(path));
       expect(res.status, path).toBe(404);
       expect(res.headers.get("Content-Type"), path).toContain("text/html");
